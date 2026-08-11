@@ -1,7 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createReportSchema } from '@/schemas/reports';
 import { createReport, getPublicReports } from '@/lib/db/reports';
-import { geocodeAddress } from '@/lib/geocoding';
 
 /**
  * GET /api/reports
@@ -55,15 +54,6 @@ export async function POST(request: NextRequest) {
         },
         { status: 400 }
       );
-    }
-
-    // Geocode address when no GPS coordinates provided
-    if (!parsed.data.lat && !parsed.data.lng && parsed.data.addressText) {
-      const coords = await geocodeAddress(parsed.data.addressText, parsed.data.city);
-      if (coords) {
-        parsed.data.lat = coords.lat;
-        parsed.data.lng = coords.lng;
-      }
     }
 
     const report = await createReport(parsed.data);
