@@ -12,6 +12,7 @@ import {
   reportTypeBadgeVariant,
   urgencyBadgeVariant,
 } from '@/lib/format';
+import { getReportById, toPublicReport } from '@/lib/db/reports';
 import type { PublicReport } from '@/types';
 
 interface Props {
@@ -20,13 +21,10 @@ interface Props {
 
 async function fetchReport(id: string): Promise<PublicReport | null> {
   try {
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/reports/${id}`, {
-      cache: 'no-store',
-    });
-    if (!res.ok) return null;
-    const data = await res.json();
-    return data.data ?? null;
+    if (!id || id.length < 36) return null;
+    const report = await getReportById(id);
+    if (!report || report.status === 'rejected') return null;
+    return toPublicReport(report);
   } catch {
     return null;
   }
