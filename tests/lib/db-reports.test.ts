@@ -21,6 +21,7 @@ describe('toPublicReport', () => {
     publicLng: -76.531,
     contactName: 'Juan Pérez',
     contactPhone: '+57 300 123 4567',
+    showContact: true,
     status: 'active',
     verificationStatus: 'unverified',
     urgency: 'high',
@@ -40,10 +41,16 @@ describe('toPublicReport', () => {
     expect(pub).not.toHaveProperty('lng');
   });
 
-  it('excludes contact information', () => {
+  it('includes contact when showContact is true', () => {
     const pub = toPublicReport(fullReport);
-    expect(pub).not.toHaveProperty('contactName');
-    expect(pub).not.toHaveProperty('contactPhone');
+    expect(pub.contactName).toBe('Juan Pérez');
+    expect(pub.contactPhone).toBe('+57 300 123 4567');
+  });
+
+  it('excludes contact when showContact is false', () => {
+    const pub = toPublicReport({ ...fullReport, showContact: false });
+    expect(pub.contactName).toBeNull();
+    expect(pub.contactPhone).toBeNull();
   });
 
   it('excludes source URL', () => {
@@ -55,7 +62,6 @@ describe('toPublicReport', () => {
     const pub = toPublicReport(fullReport);
     expect(pub).not.toHaveProperty('updatedAt');
     expect(pub).not.toHaveProperty('eventId');
-    expect(pub).not.toHaveProperty('addressText');
     expect(pub).not.toHaveProperty('vulnerablePeople');
   });
 
@@ -95,8 +101,11 @@ describe('toPublicReport', () => {
       'description',
       'city',
       'neighborhood',
+      'addressText',
       'publicLat',
       'publicLng',
+      'contactName',
+      'contactPhone',
       'status',
       'verificationStatus',
       'urgency',

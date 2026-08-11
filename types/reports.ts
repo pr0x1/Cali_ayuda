@@ -41,6 +41,7 @@ export interface Report {
   publicLng: number | null;
   contactName: string | null;
   contactPhone: string | null;
+  showContact: boolean;
   status: ReportStatus;
   verificationStatus: VerificationStatus;
   urgency: Urgency;
@@ -54,7 +55,7 @@ export interface Report {
   sourceUrl: string | null;
 }
 
-/** Public-safe DTO — never contains exact coordinates or contact details */
+/** Public-safe DTO — never contains exact coordinates; contact shown only if user opted in */
 export interface PublicReport {
   id: string;
   reportType: ReportType;
@@ -66,6 +67,8 @@ export interface PublicReport {
   addressText: string | null;
   publicLat: number | null;
   publicLng: number | null;
+  contactName: string | null;
+  contactPhone: string | null;
   status: ReportStatus;
   verificationStatus: VerificationStatus;
   urgency: Urgency;

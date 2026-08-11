@@ -24,6 +24,7 @@ function toReport(row: Record<string, unknown>): Report {
     publicLng: (row.public_lng as number) ?? null,
     contactName: (row.contact_name as string) ?? null,
     contactPhone: (row.contact_phone as string) ?? null,
+    showContact: row.show_contact !== false,
     status: row.status as Report['status'],
     verificationStatus: row.verification_status as Report['verificationStatus'],
     urgency: row.urgency as Report['urgency'],
@@ -38,7 +39,7 @@ function toReport(row: Record<string, unknown>): Report {
   };
 }
 
-/** Convert Report to public-safe DTO */
+/** Convert Report to public-safe DTO (contact only if user opted in) */
 export function toPublicReport(report: Report): PublicReport {
   return {
     id: report.id,
@@ -51,6 +52,8 @@ export function toPublicReport(report: Report): PublicReport {
     addressText: report.addressText,
     publicLat: report.publicLat,
     publicLng: report.publicLng,
+    contactName: report.showContact ? report.contactName : null,
+    contactPhone: report.showContact ? report.contactPhone : null,
     status: report.status,
     verificationStatus: report.verificationStatus,
     urgency: report.urgency,
@@ -108,6 +111,7 @@ export async function createReport(input: CreateReportInput): Promise<Report> {
       public_lng: publicLng,
       contact_name: input.contactName ?? null,
       contact_phone: input.contactPhone ?? null,
+      show_contact: input.showContact !== false,
       urgency: input.urgency ?? 'medium',
       quantity: input.quantity ?? null,
       quantity_unit: input.quantityUnit ?? null,

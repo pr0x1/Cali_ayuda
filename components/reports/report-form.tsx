@@ -32,6 +32,7 @@ export function ReportForm({ initialType }: ReportFormProps) {
   const [addressText, setAddressText] = useState('');
   const [contactName, setContactName] = useState('');
   const [contactPhone, setContactPhone] = useState('');
+  const [showContact, setShowContact] = useState(true);
   const [urgency, setUrgency] = useState<Urgency>('medium');
   const [quantity, setQuantity] = useState('');
   const [quantityUnit, setQuantityUnit] = useState('');
@@ -98,6 +99,7 @@ export function ReportForm({ initialType }: ReportFormProps) {
       addressText: addressText || undefined,
       contactName: contactName || undefined,
       contactPhone: contactPhone || undefined,
+      showContact,
       urgency,
       lat: lat ?? undefined,
       lng: lng ?? undefined,
@@ -385,9 +387,15 @@ export function ReportForm({ initialType }: ReportFormProps) {
             onChange={(e) => setContactPhone(e.target.value)}
           />
         </div>
-        <p className="text-xs text-muted-foreground">
-          La información de contacto no se muestra públicamente.
-        </p>
+        <label className="flex items-center gap-2 cursor-pointer">
+          <input
+            type="checkbox"
+            checked={showContact}
+            onChange={(e) => setShowContact(e.target.checked)}
+            className="h-4 w-4 rounded border-border"
+          />
+          <span className="text-sm">Quiero que me contacten (se mostrará públicamente)</span>
+        </label>
       </div>
 
       {/* Error display */}

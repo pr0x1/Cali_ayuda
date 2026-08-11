@@ -120,6 +120,31 @@ export default async function ReportDetailPage({ params }: Props) {
             </div>
           )}
 
+          {/* Contact */}
+          {(report.contactName || report.contactPhone) && (
+            <div>
+              <h3 className="mb-1 text-sm font-medium text-muted-foreground">
+                Contacto
+              </h3>
+              <div className="space-y-1 text-sm">
+                {report.contactName && (
+                  <p>👤 {report.contactName}</p>
+                )}
+                {report.contactPhone && (
+                  <p>
+                    📞{' '}
+                    <a
+                      href={`tel:${report.contactPhone}`}
+                      className="text-offer underline"
+                    >
+                      {report.contactPhone}
+                    </a>
+                  </p>
+                )}
+              </div>
+            </div>
+          )}
+
           {/* Stats */}
           <div className="grid grid-cols-2 gap-4 sm:grid-cols-3">
             {report.peopleAffected && (

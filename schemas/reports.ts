@@ -48,6 +48,7 @@ export const createReportSchema = z.object({
     .max(20)
     .regex(/^[\d\s+\-()]+$/, 'Formato de teléfono inválido')
     .optional(),
+  showContact: z.boolean().default(true),
   urgency: urgencySchema.default('medium'),
   quantity: z.number().positive().optional(),
   quantityUnit: z.string().max(50).optional(),

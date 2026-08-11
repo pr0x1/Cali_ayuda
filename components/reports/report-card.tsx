@@ -44,6 +44,14 @@ export function ReportCard({ report }: ReportCardProps) {
             </p>
           )}
 
+          {/* Contact info */}
+          {report.contactPhone && (
+            <p className="mt-2 text-xs text-offer">
+              📞 {report.contactPhone}
+              {report.contactName && ` — ${report.contactName}`}
+            </p>
+          )}
+
           {/* Bottom row: metadata */}
           <div className="mt-3 flex items-center justify-between text-xs text-muted-foreground">
             <div className="flex items-center gap-3">
