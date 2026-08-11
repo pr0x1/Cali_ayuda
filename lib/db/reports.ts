@@ -142,6 +142,11 @@ export async function getPublicReports(filters?: {
     .select('*')
     .order('created_at', { ascending: false });
 
+  // Always exclude expired reports and those past their expiration time
+  query = query
+    .neq('status', 'expired')
+    .gt('expires_at', new Date().toISOString());
+
   if (filters?.reportType) {
     query = query.eq('report_type', filters.reportType);
   }

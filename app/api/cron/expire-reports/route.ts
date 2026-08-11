@@ -7,7 +7,13 @@ export const runtime = 'nodejs';
 /**
  * Cron endpoint to mark stale and expired reports.
  *
- * Schedule: every 15 minutes (configured in vercel.json)
+ * Schedule: once daily at midnight UTC (configured in vercel.json)
+ * This is a BACKUP mechanism. Primary expiration is handled by pg_cron
+ * running every 15 minutes directly in Supabase (see migration 00002).
+ *
+ * Additionally, the API query layer filters out expired reports in real-time
+ * using `expires_at > NOW()`, so users never see stale data regardless
+ * of whether any cron has run.
  *
  * Flow:
  *  1. Active reports past their expires_at -> marked 'stale'
