@@ -2,11 +2,21 @@ import type { NewsResponse, XAIResponseOutput, Citation } from '@/types/news';
 
 const XAI_API_URL = 'https://api.x.ai/v1/responses';
 
-const NEWS_PROMPT = `Dame las noticias más recientes sobre el terremoto en Cali, Colombia.
+const DEFAULT_NEWS_PROMPT = `Dame las noticias más recientes sobre el terremoto en Cali, Colombia.
 Incluye información de la Alcaldía de Cali (@AlcaldiaDeCali) y fuentes oficiales.
 Resume los puntos clave de las últimas horas en español.
-Organiza la información por relevancia: primero alertas y emergencias, luego ayuda disponible, luego situación general.
-Sé conciso y directo.`;
+Organiza la información por relevancia:
+1. Alertas y emergencias activas
+2. Lugares que NECESITAN ayuda urgente (barrios, direcciones específicas)
+3. Lugares que YA NO necesitan ayuda o ya fueron atendidos
+4. Ayuda disponible (centros de acopio, albergues, puntos de distribución)
+5. Situación general
+Sé conciso y directo. Incluye direcciones y barrios cuando estén disponibles.`;
+
+/** Use env var if set, otherwise fall back to default */
+function getNewsPrompt(): string {
+  return process.env.XAI_NEWS_PROMPT || DEFAULT_NEWS_PROMPT;
+}
 
 /**
  * Fetch news from xAI using x_search tool.
@@ -30,7 +40,7 @@ export async function fetchXAINews(): Promise<NewsResponse> {
       input: [
         {
           role: 'user',
-          content: NEWS_PROMPT,
+          content: getNewsPrompt(),
         },
       ],
       tools: [{ type: 'x_search' }],
