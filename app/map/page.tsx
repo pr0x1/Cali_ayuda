@@ -1,5 +1,6 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { MapContainer } from '@/components/map/map-container';
 
 export default function MapPage() {
   return (
@@ -21,15 +22,9 @@ export default function MapPage() {
         </div>
       </header>
 
-      {/* Map container placeholder */}
-      <div className="flex flex-1 items-center justify-center bg-muted">
-        <div className="text-center text-muted-foreground">
-          <p className="text-lg">🗺️</p>
-          <p className="mt-2">El mapa se cargará aquí con MapLibre GL.</p>
-          <p className="mt-1 text-sm">
-            Requiere configuración de Supabase para mostrar reportes.
-          </p>
-        </div>
+      {/* Map fills remaining space */}
+      <div className="flex-1">
+        <MapContainer />
       </div>
     </main>
   );

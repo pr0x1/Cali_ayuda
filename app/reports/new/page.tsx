@@ -1,7 +1,21 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
+import { ReportForm } from '@/components/reports/report-form';
+import type { ReportType } from '@/types';
 
-export default function NewReportPage() {
+interface Props {
+  searchParams: Promise<{ type?: string }>;
+}
+
+const VALID_TYPES: ReportType[] = ['need', 'offer', 'service_point'];
+
+export default async function NewReportPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const rawType = params.type ?? 'need';
+  const initialType: ReportType = VALID_TYPES.includes(rawType as ReportType)
+    ? (rawType as ReportType)
+    : 'need';
+
   return (
     <main className="mx-auto max-w-lg px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
@@ -13,14 +27,7 @@ export default function NewReportPage() {
         </Link>
       </div>
 
-      {/* Form placeholder */}
-      <div className="rounded-xl border border-border p-8 text-center text-muted-foreground">
-        <p>El formulario de creación de reportes se construirá aquí.</p>
-        <p className="mt-2 text-sm">
-          Incluirá selección de tipo, categoría, ubicación GPS, y campos según
-          el tipo de reporte.
-        </p>
-      </div>
+      <ReportForm initialType={initialType} />
     </main>
   );
 }

@@ -1,40 +1,125 @@
 import Link from 'next/link';
+import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
+import { ReportCard } from '@/components/reports/report-card';
+import { ReportFilters } from '@/components/reports/report-filters';
+import type { PublicReport } from '@/types';
 
-export default function ReportsListPage() {
+interface Props {
+  searchParams: Promise<{
+    reportType?: string;
+    category?: string;
+    urgency?: string;
+  }>;
+}
+
+async function fetchReports(filters: {
+  reportType?: string;
+  category?: string;
+  urgency?: string;
+}): Promise<PublicReport[]> {
+  try {
+    const params = new URLSearchParams();
+    if (filters.reportType) params.set('reportType', filters.reportType);
+    if (filters.category) params.set('category', filters.category);
+    if (filters.urgency) params.set('urgency', filters.urgency);
+
+    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
+    const res = await fetch(`${baseUrl}/api/reports?${params.toString()}`, {
+      cache: 'no-store',
+    });
+
+    if (!res.ok) return [];
+    const data = await res.json();
+    return data.data ?? [];
+  } catch {
+    // Supabase not configured yet — return empty
+    return [];
+  }
+}
+
+async function ReportsList({
+  filters,
+}: {
+  filters: { reportType?: string; category?: string; urgency?: string };
+}) {
+  const reports = await fetchReports(filters);
+
+  if (reports.length === 0) {
+    return (
+      <div className="rounded-xl border border-border p-8 text-center text-muted-foreground">
+        <p className="text-lg">📭</p>
+        <p className="mt-2">No hay reportes que coincidan con los filtros.</p>
+        <p className="mt-1 text-sm">
+          Sé el primero en crear un reporte o ajusta los filtros.
+        </p>
+        <Link href="/reports/new" className="mt-4 inline-block">
+          <Button variant="default" size="sm">
+            + Crear reporte
+          </Button>
+        </Link>
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-3">
+      <p className="text-sm text-muted-foreground">
+        {reports.length} reporte{reports.length !== 1 ? 's' : ''} encontrado
+        {reports.length !== 1 ? 's' : ''}
+      </p>
+      {reports.map((report) => (
+        <ReportCard key={report.id} report={report} />
+      ))}
+    </div>
+  );
+}
+
+export default async function ReportsListPage({ searchParams }: Props) {
+  const params = await searchParams;
+  const filters = {
+    reportType: params.reportType,
+    category: params.category,
+    urgency: params.urgency,
+  };
+
   return (
     <main className="mx-auto max-w-4xl px-4 py-8">
       <div className="mb-6 flex items-center justify-between">
         <h1 className="text-2xl font-bold">Reportes</h1>
-        <Link href="/">
-          <Button variant="ghost" size="sm">
-            ← Inicio
-          </Button>
-        </Link>
+        <div className="flex gap-2">
+          <Link href="/reports/new">
+            <Button variant="default" size="sm">
+              + Nuevo
+            </Button>
+          </Link>
+          <Link href="/">
+            <Button variant="ghost" size="sm">
+              ← Inicio
+            </Button>
+          </Link>
+        </div>
       </div>
 
-      {/* Filters placeholder */}
-      <div className="mb-4 flex flex-wrap gap-2">
-        <Button variant="outline" size="sm">
-          Todos
-        </Button>
-        <Button variant="need" size="sm">
-          Necesidades
-        </Button>
-        <Button variant="offer" size="sm">
-          Ofertas
-        </Button>
-        <Button variant="service-point" size="sm">
-          Puntos de ayuda
-        </Button>
-      </div>
+      <Suspense fallback={null}>
+        <ReportFilters />
+      </Suspense>
 
-      {/* List placeholder */}
-      <div className="rounded-xl border border-border p-8 text-center text-muted-foreground">
-        <p>Los reportes aparecerán aquí una vez conectada la base de datos.</p>
-        <p className="mt-2 text-sm">
-          Conecta Supabase configurando las variables de entorno.
-        </p>
+      <div className="mt-4">
+        <Suspense
+          fallback={
+            <div className="space-y-3">
+              {[1, 2, 3].map((i) => (
+                <div
+                  key={i}
+                  className="h-32 animate-pulse rounded-xl border border-border bg-card"
+                />
+              ))}
+            </div>
+          }
+        >
+          <ReportsList filters={filters} />
+        </Suspense>
       </div>
     </main>
   );
