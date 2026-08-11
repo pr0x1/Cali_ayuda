@@ -1,10 +1,10 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { Card, CardContent } from '@/components/ui/card';
+import StatsDisplay from '@/components/home/stats-display';
 
 export default function HomePage() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center px-4 py-8">
+    <main className="flex min-h-[calc(100vh-3.5rem)] flex-col items-center justify-center px-4 py-8">
       {/* Header */}
       <div className="mb-8 text-center">
         <h1 className="text-4xl font-bold tracking-tight sm:text-5xl">
@@ -48,22 +48,8 @@ export default function HomePage() {
         </Link>
       </div>
 
-      {/* Stats placeholder */}
-      <Card className="mt-8 w-full max-w-md">
-        <CardContent className="grid grid-cols-3 gap-4 p-6 text-center">
-          <StatsItem label="Necesidades activas" value="—" color="text-need" />
-          <StatsItem
-            label="Recursos disponibles"
-            value="—"
-            color="text-offer"
-          />
-          <StatsItem
-            label="Casos resueltos"
-            value="—"
-            color="text-success"
-          />
-        </CardContent>
-      </Card>
+      {/* Live Stats */}
+      <StatsDisplay />
 
       {/* Navigation */}
       <div className="mt-6 flex gap-4">
@@ -86,22 +72,5 @@ export default function HomePage() {
         autoridades de emergencia.
       </p>
     </main>
-  );
-}
-
-function StatsItem({
-  label,
-  value,
-  color,
-}: {
-  label: string;
-  value: string;
-  color: string;
-}) {
-  return (
-    <div>
-      <div className={`text-2xl font-bold ${color}`}>{value}</div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-    </div>
   );
 }

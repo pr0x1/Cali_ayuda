@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from 'next';
 import './globals.css';
+import { Navbar } from '@/components/layout/navbar';
 
 export const metadata: Metadata = {
   title: 'Cali Ayuda — Coordinación de Emergencias',
@@ -22,7 +23,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="es" className="dark">
-      <body className="min-h-screen antialiased">{children}</body>
+      <body className="min-h-screen antialiased">
+        <Navbar />
+        <div className="pt-14">{children}</div>
+      </body>
     </html>
   );
 }
