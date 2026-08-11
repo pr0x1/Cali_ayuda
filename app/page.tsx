@@ -51,8 +51,21 @@ export default function HomePage() {
       {/* Live Stats */}
       <StatsDisplay />
 
+      {/* News CTA */}
+      <div className="mt-6 w-full max-w-md">
+        <Link href="/noticias" className="w-full">
+          <Button
+            variant="outline"
+            size="xl"
+            className="w-full text-lg font-semibold border-primary/50 hover:bg-primary/10"
+          >
+            📰 Noticias oficiales
+          </Button>
+        </Link>
+      </div>
+
       {/* Navigation */}
-      <div className="mt-6 flex gap-4">
+      <div className="mt-4 flex gap-4">
         <Link href="/map">
           <Button variant="outline" size="lg">
             🗺️ Ver mapa
