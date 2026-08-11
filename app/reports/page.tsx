@@ -3,6 +3,7 @@ import { Suspense } from 'react';
 import { Button } from '@/components/ui/button';
 import { ReportCard } from '@/components/reports/report-card';
 import { ReportFilters } from '@/components/reports/report-filters';
+import { getPublicReports } from '@/lib/db/reports';
 import type { PublicReport } from '@/types';
 
 interface Props {
@@ -19,21 +20,12 @@ async function fetchReports(filters: {
   urgency?: string;
 }): Promise<PublicReport[]> {
   try {
-    const params = new URLSearchParams();
-    if (filters.reportType) params.set('reportType', filters.reportType);
-    if (filters.category) params.set('category', filters.category);
-    if (filters.urgency) params.set('urgency', filters.urgency);
-
-    const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'http://localhost:3000';
-    const res = await fetch(`${baseUrl}/api/reports?${params.toString()}`, {
-      cache: 'no-store',
+    return await getPublicReports({
+      reportType: filters.reportType,
+      category: filters.category,
+      urgency: filters.urgency,
     });
-
-    if (!res.ok) return [];
-    const data = await res.json();
-    return data.data ?? [];
   } catch {
-    // Supabase not configured yet — return empty
     return [];
   }
 }
