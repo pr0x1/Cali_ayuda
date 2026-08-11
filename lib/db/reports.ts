@@ -48,6 +48,7 @@ export function toPublicReport(report: Report): PublicReport {
     description: report.description,
     city: report.city,
     neighborhood: report.neighborhood,
+    addressText: report.addressText,
     publicLat: report.publicLat,
     publicLng: report.publicLng,
     status: report.status,

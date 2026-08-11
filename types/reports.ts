@@ -63,6 +63,7 @@ export interface PublicReport {
   description: string | null;
   city: string;
   neighborhood: string | null;
+  addressText: string | null;
   publicLat: number | null;
   publicLng: number | null;
   status: ReportStatus;

@@ -99,7 +99,7 @@ export default async function ReportDetailPage({ params }: Props) {
           )}
 
           {/* Location */}
-          {(report.neighborhood || report.publicLat) && (
+          {(report.neighborhood || report.addressText || report.publicLat) && (
             <div>
               <h3 className="mb-1 text-sm font-medium text-muted-foreground">
                 Ubicación
@@ -107,6 +107,9 @@ export default async function ReportDetailPage({ params }: Props) {
               <div className="space-y-1 text-sm">
                 {report.neighborhood && (
                   <p>📍 {report.neighborhood}, {report.city}</p>
+                )}
+                {report.addressText && (
+                  <p>🏠 {report.addressText}</p>
                 )}
                 {report.publicLat && report.publicLng && (
                   <p className="text-xs text-muted-foreground">
