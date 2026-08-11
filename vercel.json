@@ -3,6 +3,10 @@
     {
       "path": "/api/cron/expire-reports",
       "schedule": "0 0 * * *"
+    },
+    {
+      "path": "/api/cron/ingest-gsheet",
+      "schedule": "*/30 * * * *"
     }
   ]
 }

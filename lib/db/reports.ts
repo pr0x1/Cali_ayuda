@@ -130,6 +130,81 @@ export async function createReport(input: CreateReportInput): Promise<Report> {
   return toReport(data);
 }
 
+/**
+ * Upsert a report by its external source_ref (idempotent ingest).
+ *
+ * AGENTS.md §4/§10: ingested reports are UNTRUSTED community input.
+ * This function FORCES source_type='community' and verification_status='unverified'.
+ * It cannot set 'official' — that is reserved for trusted moderation logic.
+ *
+ * Re-running an import with the same source_ref updates the existing row
+ * instead of creating a duplicate (DB-enforced by the unique constraint).
+ */
+export async function upsertReportBySourceRef(
+  input: CreateReportInput,
+  sourceRef: string
+): Promise<Report> {
+  const supabase = createServerClient();
+
+  const row = {
+    source_ref: sourceRef,
+    source_type: 'community' as const,
+    verification_status: 'unverified' as const,
+    report_type: input.reportType,
+    category: input.category,
+    title: input.title,
+    description: input.description ?? null,
+    city: input.city ?? DEFAULT_CITY,
+    neighborhood: input.neighborhood ?? null,
+    address_text: input.addressText ?? null,
+    // Location: ingest never sets coordinates (list-only display).
+    lat: null,
+    lng: null,
+    public_lat: null,
+    public_lng: null,
+    contact_name: input.contactName ?? null,
+    contact_phone: input.contactPhone ?? null,
+    show_contact: input.showContact !== false,
+    urgency: input.urgency ?? 'medium',
+    quantity: input.quantity ?? null,
+    quantity_unit: input.quantityUnit ?? null,
+    people_affected: input.peopleAffected ?? null,
+    vulnerable_people: input.vulnerablePeople ?? 0,
+    event_id: input.eventId ?? null,
+    expires_at: calculateExpiresAt(input.urgency ?? 'medium'),
+  };
+
+  const { data, error } = await supabase
+    .from('reports')
+    .upsert(row, { onConflict: 'source_ref' })
+    .select()
+    .single();
+
+  if (error) {
+    throw new Error(`Failed to upsert report: ${error.message}`);
+  }
+
+  return toReport(data as Record<string, unknown>);
+}
+
+/** Mark an ingested report resolved, keyed by source_ref. Returns row id or null. */
+export async function resolveReportBySourceRef(
+  sourceRef: string
+): Promise<string | null> {
+  const supabase = createServerClient();
+  const { data, error } = await supabase
+    .from('reports')
+    .update({ status: 'resolved' })
+    .eq('source_ref', sourceRef)
+    .select('id')
+    .maybeSingle();
+
+  if (error) {
+    throw new Error(`Failed to resolve report: ${error.message}`);
+  }
+  return (data?.id as string) ?? null;
+}
+
 /** Fetch public reports with optional filters */
 export async function getPublicReports(filters?: {
   reportType?: string;
