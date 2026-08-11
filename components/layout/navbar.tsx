@@ -8,6 +8,7 @@ const navLinks = [
   { href: '/map', label: 'Mapa' },
   { href: '/reports', label: 'Reportes' },
   { href: '/reports/new', label: 'Crear' },
+  { href: '/noticias', label: 'Noticias' },
 ];
 
 export function Navbar() {
