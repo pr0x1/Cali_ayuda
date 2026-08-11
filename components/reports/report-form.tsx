@@ -8,6 +8,7 @@ import { Textarea } from '@/components/ui/textarea';
 import { Select } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { REPORT_CATEGORIES, CATEGORY_LABELS } from '@/lib/constants';
+import { LocationPicker } from '@/components/map/location-picker';
 import type { ReportType, Urgency } from '@/types';
 import type { ReportCategory } from '@/lib/constants';
 
@@ -365,6 +366,17 @@ export function ReportForm({ initialType }: ReportFormProps) {
         {geoError && (
           <p className="text-xs text-destructive">{geoError}</p>
         )}
+
+        {/* Map picker — always visible so user can select/adjust location */}
+        <LocationPicker
+          lat={lat}
+          lng={lng}
+          onLocationSelect={(newLat, newLng) => {
+            setLat(newLat);
+            setLng(newLng);
+          }}
+        />
+
         <p className="text-xs text-muted-foreground">
           Tu ubicación exacta nunca se comparte públicamente. Se desplaza ~150m
           para proteger tu privacidad.
