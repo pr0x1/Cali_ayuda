@@ -19,17 +19,18 @@
 - [x] Expiración automática de reportes (cron)
 - [x] Resolver reporte desde UI (botón "Ya se resolvió" en detalle)
 
+- [x] Status "stale" automático (transición antes de expirar, con reconfirmación)
+- [x] Aumentar expiración de reportes (critical:12h, high:24h, medium:48h, low:72h)
+
 ### ❌ Pendiente
 
 - [ ] Realtime updates (Supabase Realtime — reportes nuevos sin refresh)
-- [x] Status "stale" automático (transición antes de expirar, con reconfirmación)
 - [ ] Tests automatizados (core flows)
 - [ ] Light mode (actualmente solo dark)
 
 ### 🔧 Deuda técnica
 
 - [ ] Aplicar security fixes (stash: `security-fixes-p0-edit-token-rls` — RLS, edit-token, dedup)
-- [x] Aumentar expiración de reportes (critical:12h, high:24h, medium:48h, low:72h)
 - [ ] Limpiar `/api/news` viejo (existe junto con `/api/news/stream`)
 
 ---
