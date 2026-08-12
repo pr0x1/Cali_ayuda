@@ -111,7 +111,19 @@ export function NewsFeed() {
   }
 
   if (!text && loading) {
-    return <NewsSkeleton />;
+    return (
+      <div className="rounded-lg border border-border bg-card p-6 text-center space-y-3">
+        <p className="text-2xl animate-pulse">🔍</p>
+        <p className="text-sm text-muted-foreground">
+          Consultando información reciente desde X...
+        </p>
+        <div className="flex justify-center gap-1">
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce [animation-delay:0ms]" />
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce [animation-delay:150ms]" />
+          <span className="h-2 w-2 rounded-full bg-primary animate-bounce [animation-delay:300ms]" />
+        </div>
+      </div>
+    );
   }
 
   return (

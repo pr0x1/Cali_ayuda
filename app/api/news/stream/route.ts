@@ -96,7 +96,8 @@ export async function GET(): Promise<Response> {
               const event = JSON.parse(data);
 
               // Forward text deltas to the client
-              if (event.type === 'output_text.delta' && event.delta) {
+              // xAI Responses API uses "response.output_text.delta" with field "delta"
+              if (event.type === 'response.output_text.delta' && event.delta) {
                 const sseMessage = `data: ${JSON.stringify({ type: 'text', content: event.delta })}\n\n`;
                 controller.enqueue(encoder.encode(sseMessage));
               }
