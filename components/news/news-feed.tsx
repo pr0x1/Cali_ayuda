@@ -1,58 +1,107 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
-import type { NewsResponse } from '@/types/news';
+import { useState, useCallback, useRef } from 'react';
 
-/** How often the client polls for fresh news (matches server cache) */
-const CLIENT_REFRESH_MS = 900_000; // 15 minutes
+interface Citation {
+  url: string;
+  title: string;
+}
 
 export function NewsFeed() {
-  const [news, setNews] = useState<NewsResponse | null>(null);
-  const [loading, setLoading] = useState(true);
+  const [text, setText] = useState('');
+  const [citations, setCitations] = useState<Citation[]>([]);
+  const [loading, setLoading] = useState(false);
+  const [done, setDone] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [lastRefresh, setLastRefresh] = useState<Date | null>(null);
+  const abortRef = useRef<AbortController | null>(null);
 
-  const fetchNews = useCallback(async () => {
+  const fetchStream = useCallback(async () => {
+    // Abort any previous stream
+    abortRef.current?.abort();
+    const controller = new AbortController();
+    abortRef.current = controller;
+
+    setText('');
+    setCitations([]);
+    setLoading(true);
+    setDone(false);
+    setError(null);
+
     try {
-      setError(null);
-      const res = await fetch('/api/news');
+      const res = await fetch('/api/news/stream', {
+        signal: controller.signal,
+      });
 
       if (!res.ok) {
         const body = await res.json().catch(() => ({}));
         throw new Error(body.error ?? `Error ${res.status}`);
       }
 
-      const { data } = await res.json();
-      setNews(data);
+      const reader = res.body?.getReader();
+      if (!reader) throw new Error('No response body');
+
+      const decoder = new TextDecoder();
+      let buffer = '';
+
+      while (true) {
+        const { done: streamDone, value } = await reader.read();
+        if (streamDone) break;
+
+        buffer += decoder.decode(value, { stream: true });
+        const lines = buffer.split('\n');
+        buffer = lines.pop() ?? '';
+
+        for (const line of lines) {
+          if (!line.startsWith('data: ')) continue;
+          const data = line.slice(6).trim();
+
+          try {
+            const event = JSON.parse(data);
+
+            if (event.type === 'text') {
+              setText((prev) => prev + event.content);
+            } else if (event.type === 'citations') {
+              setCitations(event.citations);
+            } else if (event.type === 'done') {
+              setDone(true);
+            } else if (event.type === 'error') {
+              setError(event.error);
+            }
+          } catch {
+            // Skip malformed events
+          }
+        }
+      }
+
       setLastRefresh(new Date());
     } catch (err) {
-      setError(err instanceof Error ? err.message : 'Error al cargar noticias');
+      if ((err as Error).name !== 'AbortError') {
+        setError(err instanceof Error ? err.message : 'Error al cargar noticias');
+      }
     } finally {
       setLoading(false);
     }
   }, []);
 
-  useEffect(() => {
-    fetchNews();
-    const interval = setInterval(fetchNews, CLIENT_REFRESH_MS);
-    return () => clearInterval(interval);
-  }, [fetchNews]);
-
-  const handleManualRefresh = () => {
-    setLoading(true);
-    fetchNews();
-  };
-
-  if (loading && !news) {
-    return <NewsSkeleton />;
+  // Auto-fetch on mount
+  const hasFetched = useRef(false);
+  if (!hasFetched.current) {
+    hasFetched.current = true;
+    // Use setTimeout to avoid state update during render
+    setTimeout(() => fetchStream(), 0);
   }
 
-  if (error && !news) {
+  const handleRefresh = () => {
+    fetchStream();
+  };
+
+  if (!text && !loading && error) {
     return (
       <div className="rounded-lg border border-border bg-card p-6 text-center">
         <p className="text-destructive font-medium mb-2">⚠️ {error}</p>
         <button
-          onClick={handleManualRefresh}
+          onClick={handleRefresh}
           className="text-sm text-primary underline hover:no-underline"
         >
           Reintentar
@@ -61,27 +110,30 @@ export function NewsFeed() {
     );
   }
 
-  if (!news) return null;
+  if (!text && loading) {
+    return <NewsSkeleton />;
+  }
 
   return (
     <div className="space-y-4">
-      {/* Summary content */}
+      {/* Summary content — streams in real-time */}
       <div className="rounded-lg border border-border bg-card p-6">
         <div className="prose prose-sm prose-invert max-w-none">
           <div className="whitespace-pre-wrap text-sm text-foreground leading-relaxed">
-            {formatSummary(news.summary)}
+            {formatSummary(text)}
+            {loading && <span className="inline-block w-2 h-4 bg-primary animate-pulse ml-0.5" />}
           </div>
         </div>
       </div>
 
-      {/* Citations / Sources */}
-      {news.citations.length > 0 && (
+      {/* Citations / Sources — appear when stream completes */}
+      {citations.length > 0 && done && (
         <div className="rounded-lg border border-border bg-card p-4">
           <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wide mb-3">
-            Fuentes ({news.citations.length})
+            Fuentes ({citations.length})
           </h3>
           <ul className="space-y-2">
-            {news.citations.map((citation, i) => (
+            {citations.map((citation, i) => (
               <li key={`${citation.url}-${i}`}>
                 <a
                   href={citation.url}
@@ -108,7 +160,7 @@ export function NewsFeed() {
             : ''}
         </span>
         <button
-          onClick={handleManualRefresh}
+          onClick={handleRefresh}
           disabled={loading}
           className="text-primary hover:underline disabled:opacity-50 disabled:cursor-not-allowed"
         >
@@ -117,23 +169,23 @@ export function NewsFeed() {
       </div>
 
       {/* Disclaimer */}
-      <p className="text-xs text-muted-foreground italic border-t border-border pt-3">
-        Información recopilada automáticamente desde X. Verifica siempre con fuentes oficiales
-        antes de tomar decisiones.
-      </p>
+      {done && (
+        <p className="text-xs text-muted-foreground italic border-t border-border pt-3">
+          Información recopilada automáticamente desde X. Verifica siempre con fuentes oficiales
+          antes de tomar decisiones.
+        </p>
+      )}
     </div>
   );
 }
 
 /** Format the summary text - clean up markdown-style references */
 function formatSummary(text: string): string {
-  // Remove inline citation markers like [[1]](url) — we show them separately
   return text.replace(/\[\[\d+\]\]\([^)]*\)/g, '').trim();
 }
 
 /** Format citation label from URL or title */
 function formatCitationLabel(citation: { url: string; title: string }): string {
-  // If title is just a number, show the URL domain instead
   if (/^\d+$/.test(citation.title)) {
     try {
       const url = new URL(citation.url);
@@ -156,11 +208,6 @@ function NewsSkeleton() {
         <div className="h-4 bg-muted rounded w-2/3" />
         <div className="h-4 bg-muted rounded w-full" />
         <div className="h-4 bg-muted rounded w-4/5" />
-      </div>
-      <div className="rounded-lg border border-border bg-card p-4 space-y-2">
-        <div className="h-3 bg-muted rounded w-20" />
-        <div className="h-3 bg-muted rounded w-48" />
-        <div className="h-3 bg-muted rounded w-40" />
       </div>
     </div>
   );
