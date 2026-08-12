@@ -36,7 +36,8 @@ export async function fetchXAINews(): Promise<NewsResponse> {
       Authorization: `Bearer ${apiKey}`,
     },
     body: JSON.stringify({
-      model: 'grok-4.5',
+      model: 'grok-4.20-0309-reasoning',
+      stream: true,
       input: [
         {
           role: 'user',
@@ -54,9 +55,53 @@ export async function fetchXAINews(): Promise<NewsResponse> {
     );
   }
 
-  const data: XAIResponseOutput = await response.json();
+  // Parse SSE stream and accumulate the response
+  const data = await parseSSEStream(response);
 
   return parseXAIResponse(data);
+}
+
+/** Read SSE stream and reconstruct the full response object */
+async function parseSSEStream(response: Response): Promise<XAIResponseOutput> {
+  const reader = response.body?.getReader();
+  if (!reader) throw new Error('No response body');
+
+  const decoder = new TextDecoder();
+  let buffer = '';
+  let lastResponse: XAIResponseOutput | null = null;
+
+  while (true) {
+    const { done, value } = await reader.read();
+    if (done) break;
+
+    buffer += decoder.decode(value, { stream: true });
+
+    // Process complete SSE lines
+    const lines = buffer.split('\n');
+    buffer = lines.pop() ?? '';
+
+    for (const line of lines) {
+      if (!line.startsWith('data: ')) continue;
+      const data = line.slice(6).trim();
+      if (data === '[DONE]') break;
+
+      try {
+        const event = JSON.parse(data);
+        // The last event with type "response.completed" contains the full response
+        if (event.type === 'response.completed' && event.response) {
+          lastResponse = event.response;
+        }
+      } catch {
+        // Skip malformed JSON lines
+      }
+    }
+  }
+
+  if (!lastResponse) {
+    throw new Error('No complete response received from stream');
+  }
+
+  return lastResponse;
 }
 
 /** Parse xAI response into structured NewsResponse */
