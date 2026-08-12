@@ -9,6 +9,7 @@ const navLinks = [
   { href: '/reports', label: 'Reportes' },
   { href: '/reports/new', label: 'Crear' },
   { href: '/noticias', label: 'Noticias' },
+  { href: '/comunidad', label: 'Comunidad' },
 ];
 
 export function Navbar() {
