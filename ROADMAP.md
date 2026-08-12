@@ -22,14 +22,14 @@
 ### ❌ Pendiente
 
 - [ ] Realtime updates (Supabase Realtime — reportes nuevos sin refresh)
-- [ ] Status "stale" automático (transición antes de expirar, con reconfirmación)
+- [x] Status "stale" automático (transición antes de expirar, con reconfirmación)
 - [ ] Tests automatizados (core flows)
 - [ ] Light mode (actualmente solo dark)
 
 ### 🔧 Deuda técnica
 
 - [ ] Aplicar security fixes (stash: `security-fixes-p0-edit-token-rls` — RLS, edit-token, dedup)
-- [ ] Aumentar expiración de service_points (actualmente 12h, debería ser más)
+- [x] Aumentar expiración de reportes (critical:12h, high:24h, medium:48h, low:72h)
 - [ ] Limpiar `/api/news` viejo (existe junto con `/api/news/stream`)
 
 ---

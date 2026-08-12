@@ -4,6 +4,7 @@ import { Button } from '@/components/ui/button';
 import { Badge } from '@/components/ui/badge';
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
 import { ConfirmButtons } from '@/components/reports/confirm-buttons';
+import { ReactivateButton } from '@/components/reports/reactivate-button';
 import {
   timeAgo,
   formatCategory,
@@ -181,6 +182,13 @@ export default async function ReportDetailPage({ params }: Props) {
                     ? '🏛️ Verificado oficialmente'
                     : ''}
               </p>
+            </div>
+          )}
+
+          {/* Stale warning + reactivate */}
+          {report.status === 'stale' && (
+            <div className="border-t border-border pt-4">
+              <ReactivateButton reportId={report.id} />
             </div>
           )}
 

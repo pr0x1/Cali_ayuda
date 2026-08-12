@@ -147,10 +147,9 @@ export async function getPublicReports(filters?: {
     .select('*')
     .order('created_at', { ascending: false });
 
-  // Always exclude expired reports and those past their expiration time
+  // Exclude expired/rejected reports. Stale reports remain visible (they can be reactivated).
   query = query
-    .neq('status', 'expired')
-    .gt('expires_at', new Date().toISOString());
+    .not('status', 'in', '("expired","rejected")');
 
   if (filters?.reportType) {
     query = query.eq('report_type', filters.reportType);

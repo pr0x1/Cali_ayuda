@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { createServerClient } from '@/lib/db/client';
+import { STALE_GRACE_HOURS } from '@/lib/constants';
 
 export const dynamic = 'force-dynamic';
 export const runtime = 'nodejs';
@@ -58,9 +59,9 @@ export async function GET(request: Request): Promise<Response> {
 
     const staleCount = staleData?.length ?? 0;
 
-    // --- Step B: Mark stale reports as expired (stale > 24h) ---
+    // --- Step B: Mark stale reports as expired (stale > STALE_GRACE_HOURS) ---
     const expiredCutoff = new Date();
-    expiredCutoff.setHours(expiredCutoff.getHours() - 24);
+    expiredCutoff.setHours(expiredCutoff.getHours() - STALE_GRACE_HOURS);
 
     const { data: expiredData, error: expiredError } = await supabase
       .from('reports')

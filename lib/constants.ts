@@ -40,11 +40,14 @@ export const CATEGORY_LABELS: Record<ReportCategory, string> = {
 
 /** Default expiration times in hours per urgency level */
 export const EXPIRATION_HOURS: Record<string, number> = {
-  critical: 2,
-  high: 4,
-  medium: 12,
-  low: 24,
+  critical: 12,
+  high: 24,
+  medium: 48,
+  low: 72,
 };
+
+/** Hours a report stays in 'stale' status before being expired */
+export const STALE_GRACE_HOURS = 24;
 
 /** Privacy displacement radius in meters for residential coordinates */
 export const PRIVACY_RADIUS_METERS = 150;

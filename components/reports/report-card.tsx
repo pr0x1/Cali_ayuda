@@ -32,6 +32,9 @@ export function ReportCard({ report }: ReportCardProps) {
               {urgencyInfo.emoji} {urgencyInfo.label}
             </Badge>
             <Badge variant="outline">{formatCategory(report.category)}</Badge>
+            {report.status === 'stale' && (
+              <Badge variant="warning">⚠️ Por expirar</Badge>
+            )}
           </div>
 
           {/* Title */}
