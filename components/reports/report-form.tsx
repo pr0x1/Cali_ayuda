@@ -9,6 +9,7 @@ import { Select } from '@/components/ui/select';
 import { Label } from '@/components/ui/label';
 import { REPORT_CATEGORIES, CATEGORY_LABELS } from '@/lib/constants';
 import { LocationPicker } from '@/components/map/location-picker';
+import { AIIntakeInput } from '@/components/reports/ai-intake-input';
 import type { ReportType, Urgency } from '@/types';
 import type { ReportCategory } from '@/lib/constants';
 
@@ -44,11 +45,44 @@ export function ReportForm({ initialType }: ReportFormProps) {
   const [geoLoading, setGeoLoading] = useState(false);
   const [geoError, setGeoError] = useState('');
 
+  const [aiPrefilled, setAiPrefilled] = useState(false);
+
   const typeLabels: Record<ReportType, { title: string; emoji: string }> = {
     need: { title: 'Necesito ayuda', emoji: '🆘' },
     offer: { title: 'Puedo ayudar', emoji: '🤝' },
     service_point: { title: 'Punto de ayuda', emoji: '📍' },
   };
+
+  function handleAIExtracted(fields: {
+    reportType?: string;
+    category?: string;
+    title?: string;
+    description?: string;
+    urgency?: string;
+    neighborhood?: string;
+    addressText?: string;
+    peopleAffected?: number;
+    vulnerablePeople?: number;
+    quantity?: number;
+    quantityUnit?: string;
+    contactPhone?: string;
+  }) {
+    if (fields.reportType) setReportType(fields.reportType as ReportType);
+    if (fields.category) setCategory(fields.category as string);
+    if (fields.title) setTitle(fields.title as string);
+    if (fields.description) setDescription(fields.description as string);
+    if (fields.urgency) setUrgency(fields.urgency as Urgency);
+    if (fields.neighborhood) setNeighborhood(fields.neighborhood as string);
+    if (fields.addressText) setAddressText(fields.addressText as string);
+    if (fields.peopleAffected)
+      setPeopleAffected(String(fields.peopleAffected));
+    if (fields.vulnerablePeople)
+      setVulnerablePeople(String(fields.vulnerablePeople));
+    if (fields.quantity) setQuantity(String(fields.quantity));
+    if (fields.quantityUnit) setQuantityUnit(fields.quantityUnit as string);
+    if (fields.contactPhone) setContactPhone(fields.contactPhone as string);
+    setAiPrefilled(true);
+  }
 
   function handleGetLocation() {
     if (!navigator.geolocation) {
@@ -160,10 +194,18 @@ export function ReportForm({ initialType }: ReportFormProps) {
 
   return (
     <form onSubmit={handleSubmit} className="space-y-6">
+      {/* AI Intake */}
+      <AIIntakeInput onFieldsExtracted={handleAIExtracted} />
+
       {/* Header */}
       <div className="rounded-lg border border-border bg-card p-4">
         <p className="text-lg font-semibold">
           {typeLabels[reportType].emoji} {typeLabels[reportType].title}
+          {aiPrefilled && (
+            <span className="ml-2 text-xs font-normal text-offer">
+              ✨ Pre-llenado por AI
+            </span>
+          )}
         </p>
       </div>
 
