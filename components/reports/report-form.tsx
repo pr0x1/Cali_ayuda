@@ -65,6 +65,7 @@ export function ReportForm({ initialType }: ReportFormProps) {
     vulnerablePeople?: number;
     quantity?: number;
     quantityUnit?: string;
+    contactName?: string;
     contactPhone?: string;
   }) {
     if (fields.reportType) setReportType(fields.reportType as ReportType);
@@ -80,6 +81,7 @@ export function ReportForm({ initialType }: ReportFormProps) {
       setVulnerablePeople(String(fields.vulnerablePeople));
     if (fields.quantity) setQuantity(String(fields.quantity));
     if (fields.quantityUnit) setQuantityUnit(fields.quantityUnit as string);
+    if (fields.contactName) setContactName(fields.contactName as string);
     if (fields.contactPhone) setContactPhone(fields.contactPhone as string);
     setAiPrefilled(true);
   }

@@ -87,6 +87,7 @@ export class GeminiProvider implements AIProvider {
                 vulnerablePeople: { type: 'integer' },
                 quantity: { type: 'integer' },
                 quantityUnit: { type: 'string' },
+                contactName: { type: 'string' },
                 contactPhone: { type: 'string' },
               },
             },

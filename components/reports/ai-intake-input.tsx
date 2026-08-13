@@ -17,6 +17,7 @@ interface ExtractedFields {
   vulnerablePeople?: number;
   quantity?: number;
   quantityUnit?: string;
+  contactName?: string;
   contactPhone?: string;
 }
 
