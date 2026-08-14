@@ -37,12 +37,20 @@
 
 ## v0.2 — AI Intake
 
-- [ ] Intake en lenguaje natural (usuario describe necesidad, AI extrae campos)
-- [ ] Clasificación automática de categoría
-- [ ] Extracción de campos estructurados desde texto libre
-- [ ] Preguntas de seguimiento generadas por AI
+### ✅ Completado
+
+- [x] Intake en lenguaje natural (usuario describe necesidad, IA extrae campos)
+- [x] Clasificación automática de categoría
+- [x] Extracción de campos estructurados desde texto libre
+- [x] Intake desde imagen (multimodal — foto de aviso, mensaje, etc.)
+- [x] Validación de contenido (rechaza input no relacionado con emergencias)
+- [x] Provider abstracto multi-modelo (Gemini default, extensible a OpenAI/xAI)
+
+### ❌ Pendiente
+
+- [ ] Preguntas de seguimiento generadas por IA
 - [ ] Detección de duplicados
-- [ ] Resúmenes con AI
+- [ ] Resúmenes con IA
 
 ---
 
