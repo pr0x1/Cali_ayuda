@@ -37,15 +37,58 @@ export function AIIntakeInput({ onFieldsExtracted }: AIIntakeInputProps) {
   const [errorMessage, setErrorMessage] = useState('');
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
+  /**
+   * Compress image using canvas to stay within Vercel payload limits.
+   * Resizes to max 1024px on longest side and uses JPEG quality 0.7.
+   */
+  function compressImage(file: File): Promise<string> {
+    return new Promise((resolve, reject) => {
+      const img = new Image();
+      const url = URL.createObjectURL(file);
+
+      img.onload = () => {
+        URL.revokeObjectURL(url);
+
+        const MAX_SIZE = 1024;
+        let { width, height } = img;
+
+        if (width > MAX_SIZE || height > MAX_SIZE) {
+          if (width > height) {
+            height = Math.round((height * MAX_SIZE) / width);
+            width = MAX_SIZE;
+          } else {
+            width = Math.round((width * MAX_SIZE) / height);
+            height = MAX_SIZE;
+          }
+        }
+
+        const canvas = document.createElement('canvas');
+        canvas.width = width;
+        canvas.height = height;
+
+        const ctx = canvas.getContext('2d');
+        if (!ctx) {
+          reject(new Error('No canvas context'));
+          return;
+        }
+
+        ctx.drawImage(img, 0, 0, width, height);
+        const dataUrl = canvas.toDataURL('image/jpeg', 0.7);
+        resolve(dataUrl);
+      };
+
+      img.onerror = () => {
+        URL.revokeObjectURL(url);
+        reject(new Error('Error al cargar imagen'));
+      };
+
+      img.src = url;
+    });
+  }
+
+  async function handleImageSelect(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];
     if (!file) return;
-
-    // Validate file size (4MB)
-    if (file.size > 4 * 1024 * 1024) {
-      setErrorMessage('La imagen no puede exceder 4MB');
-      return;
-    }
 
     // Validate file type
     if (!file.type.startsWith('image/')) {
@@ -53,14 +96,14 @@ export function AIIntakeInput({ onFieldsExtracted }: AIIntakeInputProps) {
       return;
     }
 
-    const reader = new FileReader();
-    reader.onload = () => {
-      const result = reader.result as string;
-      setImagePreview(result);
-      setImageBase64(result);
+    try {
       setErrorMessage('');
-    };
-    reader.readAsDataURL(file);
+      const compressed = await compressImage(file);
+      setImagePreview(compressed);
+      setImageBase64(compressed);
+    } catch {
+      setErrorMessage('Error al procesar la imagen. Intenta con otra.');
+    }
   }
 
   function removeImage() {
@@ -143,7 +186,6 @@ export function AIIntakeInput({ onFieldsExtracted }: AIIntakeInputProps) {
           ref={fileInputRef}
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={handleImageSelect}
           className="hidden"
           id="ai-image-input"
