@@ -46,8 +46,8 @@ export default function StatsDisplay() {
   if (loading) {
     return (
       <Card className="mt-8 w-full max-w-md">
-        <CardContent className="grid grid-cols-3 gap-4 p-6 text-center">
-          {Array.from({ length: 3 }).map((_, i) => (
+        <CardContent className="grid grid-cols-4 gap-4 p-6 text-center">
+          {Array.from({ length: 4 }).map((_, i) => (
             <div key={i} className="space-y-2">
               <div className="mx-auto h-8 w-12 animate-pulse rounded bg-muted" />
               <div className="mx-auto h-3 w-20 animate-pulse rounded bg-muted" />
@@ -60,7 +60,7 @@ export default function StatsDisplay() {
 
   return (
     <Card className="mt-8 w-full max-w-md">
-      <CardContent className="grid grid-cols-3 gap-4 p-6 text-center">
+      <CardContent className="grid grid-cols-4 gap-4 p-6 text-center">
         <div>
           <div className="text-2xl font-bold text-need">
             {stats?.needs ?? 0}
@@ -75,6 +75,14 @@ export default function StatsDisplay() {
           </div>
           <div className="text-xs text-muted-foreground">
             Recursos disponibles
+          </div>
+        </div>
+        <div>
+          <div className="text-2xl font-bold text-service-point">
+            {stats?.servicePoints ?? 0}
+          </div>
+          <div className="text-xs text-muted-foreground">
+            Puntos de ayuda
           </div>
         </div>
         <div>
