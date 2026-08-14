@@ -205,7 +205,7 @@ export function ReportForm({ initialType }: ReportFormProps) {
           {typeLabels[reportType].emoji} {typeLabels[reportType].title}
           {aiPrefilled && (
             <span className="ml-2 text-xs font-normal text-offer">
-              ✨ Pre-llenado por AI
+              ✨ Pre-llenado por IA
             </span>
           )}
         </p>

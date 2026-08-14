@@ -34,11 +34,13 @@ ${categoriesDescription}
 - contactPhone: número de teléfono si se menciona
 
 Reglas:
-1. Si el texto menciona un nombre de persona y teléfono, SIEMPRE incluye contactName y contactPhone.
-2. Si menciona un lugar (edificio, barrio, dirección), SIEMPRE incluye neighborhood o addressText.
-3. La categoría SIEMPRE debe ser una de la lista proporcionada.
-4. La descripción debe incluir los detalles específicos (tipos de insumos, cantidades, contexto).
-5. Si el número de personas se menciona, ponlo en peopleAffected.
+1. PRIMERO determina si el texto/imagen es una situación REAL de emergencia, necesidad de ayuda, oferta de ayuda, o punto de servicio. Si NO lo es (preguntas generales, spam, consultas técnicas, conversación casual, contenido no relacionado con emergencias), marca isValid como false y explica por qué en rejectionReason.
+2. Si el texto menciona un nombre de persona y teléfono, SIEMPRE incluye contactName y contactPhone.
+3. Si menciona un lugar (edificio, barrio, dirección), SIEMPRE incluye neighborhood o addressText.
+4. La categoría SIEMPRE debe ser una de la lista proporcionada.
+5. La descripción debe incluir los detalles específicos (tipos de insumos, cantidades, contexto).
+6. Si el número de personas se menciona, ponlo en peopleAffected.
+7. NO inventes datos que no estén en el texto. Si algo no se menciona, deja el campo vacío o en 0.
 
 Responde ÚNICAMENTE con un objeto JSON válido. No incluyas explicaciones, markdown, ni texto adicional fuera del JSON.`;
 }

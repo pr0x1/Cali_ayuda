@@ -42,6 +42,9 @@ export async function POST(request: NextRequest) {
     const provider = await getAIProvider();
     const fields = await provider.extractReportFields(text, image);
 
+    console.log('[/api/ai/extract] Input text:', text?.substring(0, 200));
+    console.log('[/api/ai/extract] AI response:', JSON.stringify(fields, null, 2));
+
     return NextResponse.json({ data: fields });
   } catch (error) {
     console.error('POST /api/ai/extract error:', error);

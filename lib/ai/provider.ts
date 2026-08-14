@@ -4,6 +4,10 @@
  */
 
 export interface ExtractedFields {
+  /** If true, the input was not a valid emergency report */
+  _invalid?: boolean;
+  /** Reason why the input was rejected */
+  _rejectionReason?: string;
   reportType?: 'need' | 'offer' | 'service_point';
   category?: string;
   title?: string;

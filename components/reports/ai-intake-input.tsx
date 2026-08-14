@@ -6,6 +6,8 @@ import { Textarea } from '@/components/ui/textarea';
 import { Label } from '@/components/ui/label';
 
 interface ExtractedFields {
+  _invalid?: boolean;
+  _rejectionReason?: string;
   reportType?: 'need' | 'offer' | 'service_point';
   category?: string;
   title?: string;
@@ -93,6 +95,16 @@ export function AIIntakeInput({ onFieldsExtracted }: AIIntakeInputProps) {
         return;
       }
 
+      // Check if AI rejected the input as not a valid emergency
+      if (data.data._invalid) {
+        setState('error');
+        setErrorMessage(
+          data.data._rejectionReason ||
+            'Esto no parece ser una situación de emergencia. Describe una necesidad, oferta de ayuda o punto de servicio.'
+        );
+        return;
+      }
+
       setState('done');
       onFieldsExtracted(data.data);
     } catch {
@@ -106,12 +118,12 @@ export function AIIntakeInput({ onFieldsExtracted }: AIIntakeInputProps) {
       <div className="flex items-center gap-2">
         <span className="text-lg">🤖</span>
         <Label className="text-sm font-medium">
-          Asistente AI — Describe tu situación
+          Asistente IA — Describe tu situación
         </Label>
       </div>
 
       <p className="text-xs text-muted-foreground">
-        Escribe lo que necesitas o sube una foto. La AI pre-llenará el
+        Escribe lo que necesitas o sube una foto. La IA pre-llenará el
         formulario automáticamente.
       </p>
 
@@ -180,7 +192,7 @@ export function AIIntakeInput({ onFieldsExtracted }: AIIntakeInputProps) {
       >
         {state === 'analyzing'
           ? '🔄 Analizando...'
-          : '🤖 Analizar con AI'}
+          : '🤖 Analizar con IA'}
       </Button>
 
       {/* Success message */}
