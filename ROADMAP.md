@@ -80,3 +80,4 @@
 - [x] Noticias con IA (Grok streaming desde X/noticias)
 - [x] Página de comunidad (apps aliadas)
 - [x] Prompt de noticias configurable via env var (`XAI_NEWS_PROMPT`)
+- [x] Vercel Analytics (tracking de visitas y pageviews)
