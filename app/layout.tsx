@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from 'next';
+import { Analytics } from '@vercel/analytics/next';
 import './globals.css';
 import { Navbar } from '@/components/layout/navbar';
 
@@ -26,6 +27,7 @@ export default function RootLayout({
       <body className="min-h-screen antialiased">
         <Navbar />
         <div className="pt-14">{children}</div>
+        <Analytics />
       </body>
     </html>
   );
